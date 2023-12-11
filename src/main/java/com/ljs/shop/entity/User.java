@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
+@Table(name = "\"user\"")
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
