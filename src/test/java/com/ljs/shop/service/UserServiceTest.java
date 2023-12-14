@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -80,5 +82,36 @@ class UserServiceTest {
 
         // when, then
         assertThrows(DuplicateEmailException.class, () -> userService.signUp(newUser));
+    }
+
+    @Test
+    @DisplayName("이메일로 사용자 정보 불러오기 - 성공 케이스")
+    public void loadUserByUsernameSuccessTest() {
+        // given
+        User user = User.builder()
+                .email(EMAIL)
+                .password(PASSWORD)
+                .name(NAME)
+                .address(ADDRESS)
+                .build();
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+
+        // when
+        UserDetails userDetails = userService.loadUserByUsername(EMAIL);
+
+        assertEquals(EMAIL, userDetails.getUsername());
+    }
+
+    @Test
+    @DisplayName("이메일로 사용자 정보 불러오기 - 실패 케이스")
+    public void loadUserByUsernameNotFoundTest() {
+        // given
+        String nonExistingEmail = "nonExistingEmail@test.com";
+
+        when(userRepository.findByEmail(nonExistingEmail)).thenReturn(Optional.empty());
+
+        // when, then
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(nonExistingEmail));
     }
 }
