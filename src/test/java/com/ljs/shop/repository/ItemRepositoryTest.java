@@ -6,50 +6,44 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.TestPropertySource;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @TestPropertySource(locations = "classpath:application-test.yml")
 class ItemRepositoryTest {
-
     @Autowired
     private ItemRepository itemRepository;
 
-    @Autowired
-    private TestEntityManager entityManager;
-
     @Test
-    @DisplayName("아이템 저장 테스트")
-    public void saveItemTest() {
+    @DisplayName("아이템 저장 및 조회 테스트")
+    public void saveAndRetrieveItemTest() {
         // given
-        String name = "테스트 상품";
-        int price = 10000;
-        int stock = 20;
-        String detail = "테스트 상품 상세 설명";
-        ItemSellStatus itemSellStatus = ItemSellStatus.SELL;
-
-        Item item = Item.builder()
-                .name(name)
-                .price(price)
-                .stock(stock)
-                .detail(detail)
-                .itemSellStatus(itemSellStatus)
-                .build();
+        Item item = createItem();
+        itemRepository.save(item);
 
         // when
-        Item savedItem = itemRepository.save(item);
-
-        entityManager.flush();
-        entityManager.clear();
+        List<Item> itemList = itemRepository.findAll();
 
         // then
-        assertEquals(name, savedItem.getName());
-        assertEquals(price, savedItem.getPrice());
-        assertEquals(stock, savedItem.getStock());
-        assertEquals(detail, savedItem.getDetail());
-        assertEquals(itemSellStatus, savedItem.getItemSellStatus());
+        Item savedItem = itemList.get(0);
+        assertEquals(item.getName(), savedItem.getName());
+        assertEquals(item.getPrice(), savedItem.getPrice());
+        assertEquals(item.getStock(), savedItem.getStock());
+        assertEquals(item.getDetail(), savedItem.getDetail());
+        assertEquals(item.getItemSellStatus(), savedItem.getItemSellStatus());
+    }
+
+    private Item createItem() {
+        return Item.builder()
+                .name("테스트 상품")
+                .price(10000)
+                .stock(10)
+                .detail("테스트 상품 상세 설명")
+                .itemSellStatus(ItemSellStatus.SELL)
+                .build();
     }
 }
