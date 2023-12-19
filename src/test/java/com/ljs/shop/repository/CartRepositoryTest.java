@@ -3,12 +3,11 @@ package com.ljs.shop.repository;
 import com.ljs.shop.entity.Cart;
 import com.ljs.shop.entity.User;
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,12 +21,12 @@ class CartRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Test
-    @DisplayName("장바구니 ID로 회원 엔티티 조회 테스트")
-    public void findByIdWithUserTest() {
+    @DisplayName("장바구니 회원 엔티티 매핑 조회 테스트")
+    public void findCartAndUserTest() {
         // given
         User user = createUser("test-email@test.com", "1234", "leejinseop", "seoul");
         userRepository.save(user);
@@ -60,6 +59,7 @@ class CartRepositoryTest {
     }
 
     private void assertUser(User expectedUser, User actualUser) {
+        assertEquals(expectedUser.getId(), actualUser.getId());
         assertEquals(expectedUser.getEmail(), actualUser.getEmail());
         assertEquals(expectedUser.getPassword(), actualUser.getPassword());
         assertEquals(expectedUser.getName(), actualUser.getName());
