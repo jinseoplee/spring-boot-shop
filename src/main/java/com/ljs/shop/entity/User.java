@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "users")
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,8 +19,13 @@ public class User extends BaseTimeEntity {
     @Column(unique = true)
     private String email; // 이메일
 
+    @Column(nullable = false)
     private String password; // 비밀번호
+
+    @Column(nullable = false)
     private String name; // 이름
+
+    @Column(nullable = false)
     private String address; // 주소
 
     @Enumerated(EnumType.STRING)
@@ -34,11 +39,7 @@ public class User extends BaseTimeEntity {
         this.address = address;
     }
 
-    /**
-     * 비밀번호를 암호화된 값으로 설정합니다.
-     *
-     * @param encodedPassword 암호화된 비밀번호
-     */
+    // 비밀번호를 암호화된 값으로 설정
     public void encodePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
