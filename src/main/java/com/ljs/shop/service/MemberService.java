@@ -6,6 +6,10 @@ import com.ljs.shop.exception.DuplicateMemberException;
 import com.ljs.shop.exception.PasswordMismatchException;
 import com.ljs.shop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class MemberService {
+public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -63,5 +67,25 @@ public class MemberService {
                 .ifPresent(existingMember -> {
                     throw new DuplicateMemberException();
                 });
+    }
+
+    /**
+     * 이메일에 해당하는 회원 정보를 데이터베이스에서 조회
+     *
+     * @param email 사용자 이메일
+     * @return UserDetails 인터페이스를 구현하고 있는 User 클래스
+     * @throws UsernameNotFoundException 이메일에 해당하는 회원이 데이터베이스에 없을 경우 발생
+     */
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // 데이터베이스에서 이메일로 회원 정보를 조회
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("존재하는 회원이 없습니다."));
+
+        return User.builder()
+                .username(member.getEmail())
+                .password(member.getPassword())
+                .roles(member.getRole().toString())
+                .build();
     }
 }
