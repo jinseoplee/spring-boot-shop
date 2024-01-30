@@ -29,6 +29,17 @@ public class SecurityConfig {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout"))
                 .logoutSuccessUrl("/"));
 
+        // 페이지 권한 설정
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/", "/members/**", "/item/**", "/images/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll());
+
+        // 커스텀 AuthenticationEntryPoint, AccessDeniedHandler 설정
+        http.exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler()));
+
         return http.build();
     }
 }
