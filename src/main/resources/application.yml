@@ -12,6 +12,19 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      # 파일 한 개당 최대 사이즈
+      max-file-size: 20MB
+      # 요청당 최대 파일 크기
+      max-request-size: 100MB
+
+# 상품 이미지 업로드 경로
+itemImageLocation: C:/shop/item
+
+# 리소스 업로드 경로
+uploadPath: file:///C:/shop/
+
 logging:
   level:
     org.hibernate.SQL: debug
