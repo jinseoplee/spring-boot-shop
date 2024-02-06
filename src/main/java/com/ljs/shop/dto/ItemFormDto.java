@@ -41,6 +41,7 @@ public class ItemFormDto {
                 .price(price)
                 .stock(stock)
                 .detail(detail)
+                .itemSellStatus(itemSellStatus)
                 .build();
     }
 

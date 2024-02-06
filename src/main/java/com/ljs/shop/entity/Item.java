@@ -24,13 +24,14 @@ public class Item extends BaseEntity {
     private String detail; // 상품 상세 설명
 
     @Enumerated(EnumType.STRING)
-    private ItemSellStatus itemSellStatus = ItemSellStatus.SELL; // 상품 판매 상태
+    private ItemSellStatus itemSellStatus; // 상품 판매 상태
 
     @Builder
-    public Item(String name, int price, int stock, String detail) {
+    public Item(String name, int price, int stock, String detail, ItemSellStatus itemSellStatus) {
         this.name = name;
         this.price = price;
         this.stock = stock;
         this.detail = detail;
+        this.itemSellStatus = itemSellStatus;
     }
 }
