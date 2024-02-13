@@ -2,6 +2,7 @@ package com.ljs.shop.service;
 
 import com.ljs.shop.dto.ItemFormDto;
 import com.ljs.shop.dto.ItemSearchDto;
+import com.ljs.shop.dto.MainItemDto;
 import com.ljs.shop.entity.Item;
 import com.ljs.shop.entity.ItemImage;
 import com.ljs.shop.repository.ItemRepository;
@@ -49,5 +50,15 @@ public class ItemService {
     @Transactional(readOnly = true)
     public Page<Item> findBySearchCondition(ItemSearchDto itemSearchDto, Pageable pageable) {
         return itemRepository.findBySearchCondition(itemSearchDto, pageable);
+    }
+
+    /**
+     * 메인 페이지에 표시될 상품 목록을 조회한다.
+     *
+     * @return 메인 페이지에 표시될 상품 목록
+     */
+    @Transactional(readOnly = true)
+    public List<MainItemDto> findMainItems() {
+        return itemRepository.findMainItems();
     }
 }

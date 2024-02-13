@@ -1,8 +1,11 @@
 package com.ljs.shop.repository;
 
 import com.ljs.shop.dto.ItemSearchDto;
+import com.ljs.shop.dto.MainItemDto;
+import com.ljs.shop.dto.QMainItemDto;
 import com.ljs.shop.entity.Item;
 import com.ljs.shop.entity.QItem;
+import com.ljs.shop.entity.QItemImage;
 import com.ljs.shop.entity.enums.ItemSellStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Wildcard;
@@ -55,6 +58,31 @@ public class CustomItemRepositoryImpl implements CustomItemRepository {
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    /**
+     * 메인 페이지에 표시될 상품 목록을 반환하는 메서드.
+     *
+     * @return 메인 페이지에 표시될 상품 목록
+     */
+    @Override
+    public List<MainItemDto> findMainItems() {
+        QItem item = QItem.item;
+        QItemImage itemImage = QItemImage.itemImage;
+
+        return queryFactory
+                .select(new QMainItemDto(
+                        item.id,
+                        item.name,
+                        item.detail,
+                        itemImage.imageUrl,
+                        item.price
+                ))
+                .from(itemImage)
+                .join(itemImage.item, item)
+                .where(itemImage.repImageYn.eq("Y"))
+                .orderBy(item.id.desc())
+                .fetch();
     }
 
     /**

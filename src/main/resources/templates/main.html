@@ -1,10 +1,99 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/layout}">
 
-    <div layout:fragment="content">
-        content 영역
+<th:block layout:fragment="css">
+    <style>
+        h5 {
+            font-weight: bold;
+        }
+
+        a {
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .nav-item img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .card-img-top {
+            height: 20rem;
+            object-fit: cover;
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content">
+    <ul class="nav justify-content-between mb-5">
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/hat.png}" />
+                <p>모자</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/coat.png}" />
+                <p>코트</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/shirt.png}" />
+                <p>셔츠</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/tshirt.png}" />
+                <p>티셔츠</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/long-sleeve.png}" />
+                <p>긴팔티</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/jeans.png}" />
+                <p>바지</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/shoes.png}" />
+                <p>신발</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">
+                <img th:src="@{/icons/bag.png}" />
+                <p>백팩</p>
+            </a>
+        </li>
+    </ul>
+
+    <div class="row">
+        <th:block th:each="item : ${items}">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <a th:href="'/item/' + ${item.id}">
+                        <img th:src="${item.imageUrl}" class="card-img-top">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">[[${item.name}]]</h5>
+                        <p class="card-text">&#8361;
+                            <span th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </th:block>
     </div>
+</div>
 
 </html>
