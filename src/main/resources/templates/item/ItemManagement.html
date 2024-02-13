@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/layout}">
+
+<th:block layout:fragment="css">
+    <style>
+        select {
+            margin-right: 10px;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(() => {
+            $("#searchBtn").on("click", (e) => {
+                e.preventDefault();
+                page(0);
+            })
+        });
+
+        function page(page) {
+            var dateType = $("#dateType").val();
+            var itemSellStatus = $("#itemSellStatus").val();
+            var name = $("#name").val();
+
+            location.href = "/admin/items/" + page
+                + "?dateType=" + dateType
+                + "&itemSellStatus=" + itemSellStatus
+                + "&name=" + name;
+        }
+    </script>
+</th:block>
+
+<div layout:fragment="content">
+    <form th:action="@{'/admin/items/' + ${items.number}}" method="get" th:object="${items}">
+        <h2 class="mb-3">상품 관리</h2>
+
+        <div th:object="${itemSearchDto}" class="mb-2">
+            <div class="row g-3">
+                <div class="col-sm">
+                    <select th:field="*{dateType}" class="form-select">
+                        <option value="all">전체기간</option>
+                        <option value="1d">1일</option>
+                        <option value="1w">1주</option>
+                        <option value="1m">1개월</option>
+                        <option value="6m">6개월</option>
+                    </select>
+                </div>
+                <div class="col-sm">
+                    <select th:field="*{itemSellStatus}" class="form-select">
+                        <option value="">판매상태</option>
+                        <option value="SELL">판매중</option>
+                        <option value="SOLD_OUT">품절</option>
+                    </select>
+                </div>
+                <div class="col-sm-auto">
+                    <input type="text" th:field="*{name}" placeholder="상품명을 입력하세요." class="form-control">
+                </div>
+                <div class="col-sm">
+                    <button type="submit" class="btn btn-outline-primary">검색</button>
+                </div>
+            </div>
+        </div>
+
+        <table class="table">
+            <thead class="table">
+                <tr>
+                    <th>#</th>
+                    <th>상품명</th>
+                    <th>판매 상태</th>
+                    <th>등록일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item, status:${items.getContent()}">
+                    <td th:text="${item.id}"></td>
+                    <td>
+                        <a th:href="'/admin/item/' + ${item.id}" th:text="${item.name}"></a>
+                    </td>
+                    <td
+                        th:text="${item.itemSellStatus == T(com.ljs.shop.entity.enums.ItemSellStatus).SELL} ? '판매중' : '품절'">
+                    </td>
+                    <td th:text="${#temporals.format(item.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end">
+            <a th:href="@{/admin/items}" class="btn btn-outline-secondary me-1">목록</a>
+        </div>
+
+        <nav
+            th:with="start=${(items.number/maxPage)*maxPage + 1}, end=(${(items.totalPages == 0) ? 1 : (start + (maxPage - 1) < items.totalPages ? start + (maxPage - 1) : items.totalPages)})">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${items.first} ? 'disabled'">
+                    <a class="page-link" th:onclick="'javascript:page(0)'">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="${items.first} ? 'disabled'">
+                    <a class="page-link" th:onclick="'javascript:page(' + ${items.number - 1} + ')'">
+                        <span aria-hidden="true">&lt;</span>
+                    </a>
+                </li>
+
+                <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}"
+                    th:classappend="${items.number eq page-1} ? 'active' : ''">
+                    <a th:onclick="'javascript:page(' + ${page - 1} + ')'" class="page-link">[[${page}]]</a>
+                </li>
+
+                <li class="page-item" th:classappend="${items.last} ? 'disabled'">
+                    <a class="page-link" th:onclick="'javascript:page(' + ${items.number + 1} + ')'">
+                        <span aria-hidden="true">&gt;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="${items.last} ? 'disabled'">
+                    <a class="page-link" th:onclick="'javascript:page(' + ${items.totalPages - 1} + ')'">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </form>
+</div>
+
+</html>

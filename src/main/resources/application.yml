@@ -25,6 +25,10 @@ itemImageLocation: C:/shop/item
 # 리소스 업로드 경로
 uploadPath: file:///C:/shop/
 
+pagination:
+  defaultPageSize: 10 # 기본 페이지 크기
+  maxPage: 5 # 페이지 번호의 최대 개수
+
 logging:
   level:
     org.hibernate.SQL: debug
