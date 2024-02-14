@@ -21,6 +21,7 @@ public class Item extends BaseEntity {
 
     private int stock; // 재고
 
+    @Column(length = 1000)
     private String detail; // 상품 상세 설명
 
     @Enumerated(EnumType.STRING)

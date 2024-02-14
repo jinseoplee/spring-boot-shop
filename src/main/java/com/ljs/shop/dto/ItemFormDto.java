@@ -7,10 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 @NoArgsConstructor
 @Getter
 @Setter
@@ -51,5 +53,6 @@ public class ItemFormDto {
         this.price = item.getPrice();
         this.stock = item.getStock();
         this.detail = item.getDetail();
+        this.itemSellStatus = item.getItemSellStatus();
     }
 }

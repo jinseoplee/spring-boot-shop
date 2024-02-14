@@ -84,6 +84,15 @@ public class ItemController {
         return "/item/itemManagement";
     }
 
+    // 상품 상세 조회
+    @GetMapping("/item/{itemId}")
+    public String itemDetail(@PathVariable("itemId") Long itemId, Model model) {
+        ItemFormDto itemFormDto = itemService.getItemDetail(itemId);
+        model.addAttribute("item", itemFormDto);
+        model.addAttribute("newLine", "\n");
+        return "/item/itemDetail";
+    }
+
     /**
      * 사용자가 업로드한 이미지 파일을 반환
      *

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<th:block layout:fragment="css">
+    <style>
+        img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .order-btn {
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            background-color: black;
+            width: 100%;
+        }
+
+        .order-btn span {
+            color: white;
+        }
+
+        .wish-btn {
+            border: 1px solid #999999;
+            border-radius: 30px;
+            padding: 10px 20px;
+            background-color: white;
+            width: 100%;
+            box-shadow: none;
+        }
+
+        .sold-out-btn {
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            background-color: red;
+            width: 100%;
+        }
+
+        .sold-out-btn span {
+            color: white;
+        }
+    </style>
+</th:block>
+<div layout:fragment="content">
+    <div class="row">
+        <!-- left start -->
+        <div class="col-md-8">
+            <div class="row">
+                <th:block th:each="itemImage : ${item.itemImageDtos}">
+                    <div class="col-md-6 mb-3">
+                        <img th:src="${itemImage.imageUrl}">
+                    </div>
+                </th:block>
+            </div>
+        </div>
+        <!-- left end -->
+        <!-- right start -->
+        <div class="col-md-4 text-center">
+            <div class="mb-3">
+                <div class="h4" th:text="${item.name}"></div>
+                <div class="h5" th:text="${item.price}"></div>
+                <span th:utext="${#strings.replace(item.detail, newLine, '&lt;br /&gt;')}"></span>
+            </div>
+            <div th:if="${item.itemSellStatus == T(com.ljs.shop.entity.enums.ItemSellStatus).SELL}">
+                <button type="button" class="order-btn mb-2"><span>주문하기</span></button>
+                <button type="button" class="wish-btn">위시리스트</button>
+            </div>
+            <div th:unless="${item.itemSellStatus == T(com.ljs.shop.entity.enums.ItemSellStatus).SELL}">
+                <button type="button" class="sold-out-btn mb-2"><span>품절</span></button>
+            </div>
+        </div>
+        <!-- right end -->
+    </div>
+</div>
+
+</html>
