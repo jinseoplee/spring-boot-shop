@@ -1,6 +1,7 @@
 package com.ljs.shop.entity;
 
 import com.ljs.shop.entity.enums.ItemSellStatus;
+import com.ljs.shop.exception.OutOfStockException;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,5 +35,19 @@ public class Item extends BaseEntity {
         this.stock = stock;
         this.detail = detail;
         this.itemSellStatus = itemSellStatus;
+    }
+
+    /**
+     * 재고를 감소시키는 메서드
+     *
+     * @param count 상품 주문 수량
+     * @throws OutOfStockException 상품 주문 수량이 재고보다 많을 때 발생
+     */
+    public void decreaseStock(int count) {
+        int restStock = this.stock - count;
+        if (restStock < 0) {
+            throw new OutOfStockException("상품의 재고가 부족합니다.");
+        }
+        this.stock = restStock;
     }
 }
