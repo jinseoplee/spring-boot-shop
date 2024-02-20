@@ -1,23 +1,28 @@
-html {
-    position: relative;
-    min-height: 100%;
+html,
+body {
     margin: 0;
+    padding: 0;
+    height: 100%;
 }
 
-body {
-    min-height: 100%;
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.main-content {
+    flex: 1;
 }
 
 .footer {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    padding: 15px 0;
+    padding: 20px 0;
     text-align: center;
+    background-color: #232323;
+    color: white;
 }
 
-.content {
-    margin: 3% 10%;
+.footer a {
+    text-decoration: none;
+    color: white;
 }
