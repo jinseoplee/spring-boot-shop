@@ -1,18 +1,22 @@
 package com.ljs.shop.service;
 
 import com.ljs.shop.dto.OrderDto;
-import com.ljs.shop.entity.Item;
-import com.ljs.shop.entity.Member;
-import com.ljs.shop.entity.Order;
-import com.ljs.shop.entity.OrderItem;
+import com.ljs.shop.dto.OrderHistoryDto;
+import com.ljs.shop.dto.OrderItemDto;
+import com.ljs.shop.entity.*;
+import com.ljs.shop.repository.ItemImageRepository;
 import com.ljs.shop.repository.ItemRepository;
 import com.ljs.shop.repository.MemberRepository;
 import com.ljs.shop.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +25,7 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+    private final ItemImageRepository itemImageRepository;
     private final MemberRepository memberRepository;
 
     /**
@@ -50,5 +55,45 @@ public class OrderService {
         orderRepository.save(order);
 
         return order.getId();
+    }
+
+    /**
+     * 이메일에 해당하는 회원의 주문 목록을 페이지네이션하여 반환하는 메서드
+     *
+     * @param email    회원 이메일
+     * @param pageable 페이지 정보
+     * @return 주문 이력 페이지 객체
+     */
+    @Transactional(readOnly = true)
+    public Page<OrderHistoryDto> getOrderHistoryList(String email, Pageable pageable) {
+        // 사용자의 주문 목록을 조회한다.
+        List<Order> orders = orderRepository.findMyOrders(email, pageable);
+
+        // 사용자의 주문 수를 구한다.
+        Long totalCount = orderRepository.countOrders(email);
+
+        // 주문 이력들을 저장하는 리스트를 생성한다.
+        List<OrderHistoryDto> orderHistoryDtoList = new ArrayList<>();
+
+        // 주문 리스트를 순회하면서 주문 이력 페이지에 전달할 주문 이력 DTO를 생성한다.
+        for (Order order : orders) {
+            OrderHistoryDto orderHistoryDto = new OrderHistoryDto(order);
+
+            List<OrderItem> orderItems = order.getOrderItems();
+            for (OrderItem orderItem : orderItems) {
+                // 주문 상품 대표 이미지를 조회한다.
+                ItemImage itemImage = itemImageRepository.findByItemIdAndRepImageYn(orderItem.getItem().getId(), "Y");
+
+                // 주문 상품 DTO를 생성하고 주문 이력 DTO에 추가한다.
+                OrderItemDto orderItemDto = new OrderItemDto(orderItem, itemImage.getImageUrl());
+                orderHistoryDto.addOrderItemDto(orderItemDto);
+            }
+
+            // 주문 이력들을 저장하는 리스트에 주문 이력을 추가한다.
+            orderHistoryDtoList.add(orderHistoryDto);
+        }
+
+        // 페이지 구현 객체를 생성하고 반환한다.
+        return new PageImpl<>(orderHistoryDtoList, pageable, totalCount);
     }
 }
