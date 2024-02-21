@@ -32,6 +32,7 @@ public class SecurityConfig {
         // 페이지 권한 설정
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/", "/members/**", "/item/**", "/images/**").permitAll()
+                .requestMatchers("/orders/**").authenticated()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll());
 
