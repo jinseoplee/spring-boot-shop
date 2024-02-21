@@ -1,28 +1,40 @@
 package com.ljs.shop.controller;
 
 import com.ljs.shop.dto.OrderDto;
+import com.ljs.shop.dto.OrderHistoryDto;
 import com.ljs.shop.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
 public class OrderController {
     private final OrderService orderService;
 
+    @Value("${pagination.defaultPageSize}")
+    private int defaultPageSize;
+
+    @Value("${pagination.maxPage}")
+    private int maxPage;
+
     @PostMapping("/order")
-    public @ResponseBody ResponseEntity<?> order(@RequestBody @Valid OrderDto orderDto, BindingResult bindingResult, Principal principal) {
+    public @ResponseBody
+    ResponseEntity<?> order(@RequestBody @Valid OrderDto orderDto, BindingResult bindingResult, Principal principal) {
         // 데이터 유효성 검사
         if (bindingResult.hasErrors()) {
             StringBuilder sb = new StringBuilder();
@@ -53,5 +65,15 @@ public class OrderController {
 
         // 주문 처리 성공 시 주문 id와 OK 상태 코드 반환
         return new ResponseEntity<Long>(orderId, HttpStatus.OK);
+    }
+
+    @GetMapping({"/orders", "/orders/{page}"})
+    public String orderHistory(@PathVariable("page") Optional<Integer> page, Principal principal, Model model) {
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, defaultPageSize);
+        Page<OrderHistoryDto> orderHistoryDtoList = orderService.getOrderHistoryList(principal.getName(), pageable);
+        model.addAttribute("orders", orderHistoryDtoList);
+        model.addAttribute("page", pageable.getPageNumber());
+        model.addAttribute("maxPage", maxPage);
+        return "order/orderHistory";
     }
 }
