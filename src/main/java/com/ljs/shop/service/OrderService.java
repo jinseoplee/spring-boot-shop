@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,5 +96,38 @@ public class OrderService {
 
         // 페이지 구현 객체를 생성하고 반환한다.
         return new PageImpl<>(orderHistoryDtoList, pageable, totalCount);
+    }
+
+    /**
+     * 주문의 유효성을 검증하는 메서드
+     *
+     * @param orderId 주문 ID
+     * @param email   현재 사용자의 이메일
+     * @return 유효한 주문인 경우 true를 반환하고, 그렇지 않은 경우 false를 반환한다.
+     * @throws EntityNotFoundException 주어진 이메일로 등록된 회원이나 주어진 주문 ID에 해당하는 주문을 찾을 수 없을 때 발생
+     */
+    @Transactional(readOnly = true)
+    public boolean validateOrder(Long orderId, String email) {
+        Member currMember = memberRepository.findByEmail(email)
+                .orElseThrow(EntityNotFoundException::new);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(EntityNotFoundException::new);
+        Member savedMember = order.getMember();
+
+        return StringUtils.equals(currMember.getEmail(), savedMember.getEmail());
+    }
+
+    /**
+     * 주문을 취소하는 메서드
+     *
+     * @param orderId 취소할 주문 ID
+     * @throws EntityNotFoundException 주어진 주문 ID에 해당하는 주문을 찾을 수 없을 때 발생
+     */
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(EntityNotFoundException::new);
+        order.cancelOrder();
     }
 }
