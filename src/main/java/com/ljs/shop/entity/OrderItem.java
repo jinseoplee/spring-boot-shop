@@ -55,4 +55,11 @@ public class OrderItem extends BaseEntity {
     public void setOrder(Order order) {
         this.order = order;
     }
+
+    /**
+     * 주문 취소 시 주문 수량만큼 상품의 재고를 더해주는 메서드
+     */
+    public void cancel() {
+        this.getItem().addStock(count);
+    }
 }
