@@ -64,4 +64,14 @@ public class Order extends BaseEntity {
         }
         return totalPrice;
     }
+
+    /**
+     * 주문 상태를 CANCEL로 변경하고 주문 상품 수량을 상품 재고에 더한다.
+     */
+    public void cancelOrder() {
+        this.orderStatus = OrderStatus.CANCEL;
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel();
+        }
+    }
 }
