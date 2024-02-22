@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/layout}">
+
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        function cancelOrder(orderId) {
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var token = $("meta[name='_csrf']").attr("content");
+
+            var url = "/order/" + orderId + "/cancel";
+            var paramData = {
+                orderId: orderId
+            };
+            var data = JSON.stringify(paramData);
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                contentType: "application/json",
+                data: data,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(header, token);
+                },
+                dataType: "json",
+                cache: false,
+                success: function (result, status) {
+                    alert("주문이 취소되었습니다.");
+                    location.href = '/orders';
+                },
+                error: function (jqXHR, status, error) {
+                    if (jqXHR.state == '401') {
+                        alert('로그인 후 이용해주세요.');
+                        location.href = '/members/login';
+                    } else {
+                        alert(jqXHR.responseText);
+                    }
+                }
+            })
+        }
+    </script>
+</th:block>
+
+<div layout:fragment="content">
+    <h2>구매 이력</h2>
+    <table class="table align-middle">
+        <thead>
+            <tr class="text-center">
+                <th scope="col" style="width: 40%;">상품 정보</th>
+                <th scope="col">수량</th>
+                <th scope="col">주문 일자</th>
+                <th scope="col">주문 번호</th>
+                <th scope="col">주문 금액</th>
+                <th scope="col">주문 상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <th:block th:each="order : ${orders.getContent()}">
+                <th:block th:each="orderItem : ${order.orderItemDtoList}">
+                    <tr>
+                        <td>
+                            <img th:src="${orderItem.imageUrl}" style="display: inline; width: 150px; height: 150px;">
+                            <b th:text="${orderItem.name}"></b>
+                        </td>
+                        <td th:text="${orderItem.count}" class="text-center"></td>
+                        <td th:text="${order.orderDate}" class="text-center"></td>
+                        <td th:text="${order.orderId}" class="text-center"></td>
+                        <td th:text="${#numbers.formatInteger(orderItem.orderPrice, 0, 'COMMA')} + '원'"
+                            class="text-center"></td>
+                        <th:block th:if="${order.orderStatus == T(com.ljs.shop.entity.enums.OrderStatus).ORDER}">
+                            <td class="text-center">주문 완료<br><button type="button" class="btn btn-outline-secondary"
+                                    th:value="${order.orderId}" onclick="cancelOrder(this.value)">주문 취소</button></td>
+                        </th:block>
+                        <th:block th:unless="${order.orderStatus == T(com.ljs.shop.entity.enums.OrderStatus).ORDER}">
+                            <td class="text-center">취소 완료</td>
+                        </th:block>
+                    </tr>
+                </th:block>
+            </th:block>
+        </tbody>
+    </table>
+</div>
+
+</html>
