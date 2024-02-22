@@ -50,4 +50,13 @@ public class Item extends BaseEntity {
         }
         this.stock = restStock;
     }
+
+    /**
+     * 재고를 증가시키는 메서드
+     *
+     * @param count 수량
+     */
+    public void addStock(int count) {
+        this.stock += count;
+    }
 }
